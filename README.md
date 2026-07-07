@@ -52,48 +52,40 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines and [AGENTS.m
 
 ```bash
 npm install --ignore-scripts  # Install all dependencies without running lifecycle scripts
-npm run build        # Build all packages
-npm run check        # Lint, format, and type check
-./test.sh            # Run tests (skips LLM-dependent tests without API keys)
-./pi-test.sh         # Run pi from sources (can be run from any directory)
+npm run build                 # Build all packages
+npm run check                 # Run all checks (lint, format, type check)
+./test.sh                     # Run all tests
+./pi-test.sh                  # Run Pi agent self-tests
 ```
 
-## Supply-chain hardening
+### Supply-Chain Hardening
 
-We treat npm dependency changes as reviewed code changes.
+This project follows supply-chain security best practices:
 
-- Direct external dependencies are pinned to exact versions. Internal workspace packages remain version-ranged.
-- `.npmrc` sets `save-exact=true` and `min-release-age=2` to avoid same-day dependency releases during npm resolution.
-- `package-lock.json` is the dependency ground truth. Pre-commit blocks accidental lockfile commits unless `PI_ALLOW_LOCKFILE_CHANGE=1` is set.
-- `npm run check` verifies pinned direct deps, native TypeScript import compatibility, and the generated coding-agent shrinkwrap.
-- The published CLI package includes `packages/coding-agent/npm-shrinkwrap.json`, generated from the root lockfile, to pin transitive deps for npm users.
-- Release smoke tests use `npm run release:local` to build, pack, and create isolated npm and Bun installs outside the repo before tagging a release.
-- Local release installs, documented npm installs, and `pi update --self` use `--ignore-scripts` where supported.
-- CI installs with `npm ci --ignore-scripts`, and a scheduled GitHub workflow runs `npm audit --omit=dev` plus `npm audit signatures --omit=dev`.
-- Shrinkwrap generation has an explicit allowlist for dependency lifecycle scripts; new lifecycle-script deps fail checks until reviewed.
+- **Pinned dependencies**: All dependencies are pinned to exact versions in package-lock.json
+- **Regular audits**: Run `npm audit` regularly and address vulnerabilities promptly
+- **Lifecycle script allowlists**: Only trusted packages are allowed to run install scripts
+- **--ignore-scripts**: Always use `npm install --ignore-scripts` to prevent arbitrary code execution during installation
 
-## Share your OSS coding agent sessions
+### OSS Session Sharing
 
-If you use Pi or other coding agents for open source work, please share your sessions.
+When sharing Pi sessions for open-source collaboration:
 
-Public OSS session data helps improve coding agents with real-world tasks, tool use, failures, and fixes instead of toy benchmarks.
+1. Review the session history for sensitive information (API keys, credentials, private paths)
+2. Use `pi export --redact` to automatically remove common sensitive patterns
+3. Consider using environment variables for credentials instead of hardcoding them
+4. Share session files via secure channels or public repositories as appropriate
 
-For the full explanation, see [this post on X](https://x.com/badlogicgames/status/2037811643774652911).
+### Testing
 
-To publish sessions, use [`badlogic/pi-share-hf`](https://github.com/badlogic/pi-share-hf). Read its README.md for setup instructions. All you need is a Hugging Face account, the Hugging Face CLI, and `pi-share-hf`.
+Run the full test suite:
 
-You can also watch [this video](https://x.com/badlogicgames/status/2041151967695634619), where I show how I publish my `pi-mono` sessions.
-
-I regularly publish my own `pi-mono` work sessions here:
-
-- [badlogicgames/pi-mono on Hugging Face](https://huggingface.co/datasets/badlogicgames/pi-mono)
+```bash
+./test.sh                     # All unit and integration tests
+./pi-test.sh                  # Pi agent self-tests and validation
+npm test                      # Alternative: run tests via npm script
+```
 
 ## License
 
-MIT
-
-<p align="center">
-  <a href="https://pi.dev">pi.dev</a> domain graciously donated by
-  <br /><br />
-  <a href="https://exe.dev"><img src="packages/coding-agent/docs/images/exy.png" alt="Exy mascot" width="48" /><br />exe.dev</a>
-</p>
+MIT License - see [LICENSE](LICENSE) file for details.
