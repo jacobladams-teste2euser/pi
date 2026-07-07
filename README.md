@@ -1,5 +1,3 @@
-This is a test from Forge AI
-
 <p align="center">
   <a href="https://pi.dev">
     <img alt="pi logo" src="https://pi.dev/logo-auto.svg" width="128">
@@ -56,7 +54,36 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines and [AGENTS.m
 npm install --ignore-scripts  # Install all dependencies without running lifecycle scripts
 npm run build                 # Build all packages
 npm run check                 # Run all checks (lint, format, type check)
-npm test                      # Run all tests
+./test.sh                     # Run all tests
+./pi-test.sh                  # Run Pi agent self-tests
+```
+
+### Supply-Chain Hardening
+
+This project follows supply-chain security best practices:
+
+- **Pinned dependencies**: All dependencies are pinned to exact versions in package-lock.json
+- **Regular audits**: Run `npm audit` regularly and address vulnerabilities promptly
+- **Lifecycle script allowlists**: Only trusted packages are allowed to run install scripts
+- **--ignore-scripts**: Always use `npm install --ignore-scripts` to prevent arbitrary code execution during installation
+
+### OSS Session Sharing
+
+When sharing Pi sessions for open-source collaboration:
+
+1. Review the session history for sensitive information (API keys, credentials, private paths)
+2. Use `pi export --redact` to automatically remove common sensitive patterns
+3. Consider using environment variables for credentials instead of hardcoding them
+4. Share session files via secure channels or public repositories as appropriate
+
+### Testing
+
+Run the full test suite:
+
+```bash
+./test.sh                     # All unit and integration tests
+./pi-test.sh                  # Pi agent self-tests and validation
+npm test                      # Alternative: run tests via npm script
 ```
 
 ## License
