@@ -78,6 +78,7 @@ cp permission-gate.ts ~/.pi/agent/extensions/
 | `interactive-shell.ts` | Run interactive commands (vim, htop) with full terminal via `user_bash` hook |
 | `inline-bash.ts` | Expands `!{command}` patterns in prompts via `input` event transformation |
 | `input-transform-streaming.ts` | Skips expensive input preprocessing for mid-stream steering via `streamingBehavior` |
+| `todos-in-codebase.ts` | Scans the codebase for TODO/FIXME/HACK/XXX comments and shows them in a scrollable overlay via `/todos` |
 
 ### Git Integration
 
