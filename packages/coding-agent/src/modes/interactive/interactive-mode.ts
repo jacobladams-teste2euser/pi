@@ -2650,7 +2650,12 @@ export class InteractiveMode {
 				this.editor.setText("");
 				return;
 			}
-			if (text === "/quit") {
+			if (text === "/todos") {
+				this.handleTodosCommand();
+				this.editor.setText("");
+				return;
+			}
+						if (text === "/quit") {
 				this.editor.setText("");
 				await this.shutdown();
 				return;
@@ -5396,6 +5401,49 @@ export class InteractiveMode {
 		this.chatContainer.addChild(new Text(theme.bold(theme.fg("accent", "What's New")), 1, 0));
 		this.chatContainer.addChild(new Spacer(1));
 		this.chatContainer.addChild(new Markdown(changelogMarkdown, 1, 1, this.getMarkdownThemeWithSettings()));
+		this.chatContainer.addChild(new DynamicBorder());
+		this.ui.requestRender();
+	}
+
+	private handleTodosCommand(): void {
+		const cwd = this.sessionManager.getCwd();
+		const todos = scanTodos(cwd);
+
+		let output: string;
+		if (todos.length === 0) {
+			output = "_No TODO, FIXME, HACK, or XXX comments found._";
+		} else {
+			// Group by file for a clean, scannable layout
+			const byFile = new Map();
+			for (const item of todos) {
+				const existing = byFile.get(item.file);
+				if (existing) {
+					existing.push({ line: item.line, tag: item.tag, text: item.text });
+				} else {
+					byFile.set(item.file, [{ line: item.line, tag: item.tag, text: item.text }]);
+				}
+			}
+
+			const parts: string[] = [];
+			for (const [file, items] of byFile) {
+				parts.push(`**${file}**`);
+				for (const { line, tag, text } of items) {
+					const label = tag.padEnd(5);
+					const displayText = text.trim() ? ` ${text.trim()}` : "";
+					parts.push(`- \`L${line}\` **${label}**${displayText}`);
+				}
+			}
+
+			const total = todos.length;
+			const fileCount = byFile.size;
+			output = parts.join("\n") + `\n\n_${total} item${total === 1 ? "" : "s"} across ${fileCount} file${fileCount === 1 ? "" : "s"}_`;
+		}
+
+		this.chatContainer.addChild(new Spacer(1));
+		this.chatContainer.addChild(new DynamicBorder());
+		this.chatContainer.addChild(new Text(theme.bold(theme.fg("accent", "TODOs")), 1, 0));
+		this.chatContainer.addChild(new Spacer(1));
+		this.chatContainer.addChild(new Markdown(output, 1, 1, this.getMarkdownThemeWithSettings()));
 		this.chatContainer.addChild(new DynamicBorder());
 		this.ui.requestRender();
 	}
